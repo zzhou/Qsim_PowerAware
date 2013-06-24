@@ -1,0 +1,3 @@
+Qsim is a event-driven jobs scheduling simulator being part of the Cobalt resource mananger.
+It contains several files specific for simulation while using most of the code directly from Cobalt.
+The simulation specific parts including event-mananger, queue-simulators, and system simulator, etc.
