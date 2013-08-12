@@ -6,10 +6,9 @@ Created on Dec 28, 2011
 @author: zhouzhou
 '''
 import time
-from datetime import datetime
-
 import logging
 
+from datetime import datetime
 from Cobalt.Components.qsim_base import PBSlogger
 from Cobalt.Proxy import ComponentProxy
 from Cobalt.Components.base import Component, exposed
@@ -50,6 +49,7 @@ class PowerMonitor(Component):
             self.iomon_logger = PBSlogger(self.bqsim.get_outputlog_string() + "-powmon")
             
     def get_log_title(self):
+        ''' generate a log file title '''
         power_budget = self.bqsim.get_power_budget()
         return ("BGP_power_aware_"+
                str(self.bqsim.is_power_aware())+
@@ -61,6 +61,7 @@ class PowerMonitor(Component):
                ".list")   
             
     def log_avg_info(self, spec):
+        ''' log average power and utilization information '''
         power_budget = self.bqsim.get_power_budget()
         
         print "power budget: ", power_budget
@@ -73,7 +74,7 @@ class PowerMonitor(Component):
         return True
     
     def log_info1(self, spec, filename):
-        
+        ''' log a certain string into file specified by filename '''
         f=open(filename, "a")
 
         print >> f, spec
@@ -81,7 +82,7 @@ class PowerMonitor(Component):
         return True 
     
     def insert_tag(self, tag):
-        
+        ''' insert power & util tag into timeline '''
         pos = len(self.time_power_list)
         
         while tag["unixtime"] < self.time_power_list[pos-1].get("unixtime"):
@@ -112,6 +113,7 @@ class PowerMonitor(Component):
         return pos
     
     def get_current_price_level(self):
+        ''' return price level '''
         time = self.event_manager.get_current_time()
         tmp = datetime.fromtimestamp(time)
         fmtdate = int(tmp.strftime("%H"))
@@ -124,12 +126,14 @@ class PowerMonitor(Component):
         
     
     def monitor_power(self):
+        ''' log current system running information including power '''
         time = self.event_manager.get_current_time()
         total_power = self.bqsim.get_running_job_power_usage()
         price = self.get_current_price_level()
         utilization = self.bqsim.get_utilization_rate()
         queue_length = self.bqsim.get_waiting()
           
+        ''' accumulate the total energy cost '''
         self.total_cost += total_power * (time - self.event_manager.get_last_schedule_time()) * price
         
         tmp = datetime.fromtimestamp(time)
@@ -151,13 +155,14 @@ class PowerMonitor(Component):
             self.log_info1("%s total_power %.5f jobs %d utilization %.5f waiting %d" % (time_tag, total_power, self.bqsim.get_running_job_number(), utilization, queue_length), "power_log_"+self.get_log_title())
         else:
             self.log_info1("%s total_power %.5f jobs %d utilization %.5f waiting %d " % (time_tag, total_power, self.bqsim.get_running_job_number(), utilization, queue_length),"power_log_"+self.get_log_title())
-        
-        #print "total power:", total_power
-        #print "total cost:", self.total_cost
+
     
     def get_cost(self):
+        ''' get total energy cost '''
         return self.total_cost/10000000
     
+    
     def log_power_consumption(self):
+        ''' log the power information based on the timeline '''
         return self.log_avg_info(self.time_power_list)
     

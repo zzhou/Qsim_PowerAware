@@ -706,58 +706,15 @@ class BGSched (Component):
             if not active_jobs:
                 continue
             active_jobs.sort(self.utilitycmp)
-            
-            ''' Resort jobs within window '''
-#            if self.checkPowerAware():
-#                #window_size = ComponentProxy(self.COMP_SYSTEM).get_window_size()  
-#                window_size = len(active_jobs)
-#                # window size for job resorting
-#                active_jobs_top10 = active_jobs[0:int(window_size)]
-#                active_jobs_rest = active_jobs[int(window_size):len(active_jobs)]
-#                
-#                price_level = self.checkPriceLevel()
-#                
-#                if price_level == HIGH:
-#                    #reorganize jobs
-#                    active_jobs_top10.sort(self.powercmp_asc)    
-#                elif price_level == LOW:
-#                    active_jobs_top10.sort(self.powercmp_desc)
-#                    
-#                active_jobs = active_jobs_top10
-#                active_jobs.extend(active_jobs_rest)
-            
+                       
             power_aware = self.checkPowerAware()
-            
+
             if power_aware:
+                # decide whether do power-aware scheduling based on available power budget
                 price_level = self.checkPriceLevel()
                 if price_level == HIGH:
                     if not self.check_power_budget_available(active_jobs):
                         return                
-            
-#            if self.checkPowerAware():
-#                log_queue_length = self.get_queue_length_log_title()
-#                pre_length = len(active_jobs)
-#                head_job = active_jobs[0]
-#                
-#                if self.checkPowerAware() == HIGH:
-#                    active_jobs.sort(self.powercmp_asc)
-#                    position = active_jobs.index(head_job)
-#                    trunc_active_jobs = active_jobs[0: position+1]
-#                    active_jobs = trunc_active_jobs
-#                else:
-#                    active_jobs.sort(self.powercmp_desc)
-#                    position = active_jobs.index(head_job)
-#                    trunc_active_jobs = active_jobs[0:position+1]
-#                    active_jobs = trunc_active_jobs
-#                post_length = len(active_jobs)
-            
-#            ''' Log job info '''
-#            log_file = self.get_schedule_log_title()+ "_" + str(power_aware) +".list"
-#            log_str = ""
-#            for job in active_jobs:
-#                log_str = log_str + "{jobid %s nodes %s power %s walltime %s}\n" % (str(job.jobid), str(job.nodes), str(job.power), str(job.walltime))
-#            self.log_info(self.getCurrentDateTime(), log_file)
-#            self.log_info(log_str, log_file)
                 
             best_partition_dict = {}
             # now smoosh lots of data together to be passed to the allocator in the system component
@@ -797,7 +754,6 @@ class BGSched (Component):
             except:
                 self.logger.error("failed to connect to system component", exc_info=True)
                 best_partition_dict = {}
-            
             
             # release reserved partition
             for jobid in best_partition_dict:
