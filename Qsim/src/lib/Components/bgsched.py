@@ -852,7 +852,7 @@ class BGSched (Component):
         print >> f, spec
         f.close()
         return True
-    
+
     def release_partition(self, partition):
         return ComponentProxy(self.COMP_SYSTEM).release_partition(partition)
     release_partition = exposed(release_partition)
@@ -904,26 +904,12 @@ class BGSched (Component):
     def getSimEnd(self):
         return ComponentProxy(self.COMP_SYSTEM).get_sim_end()
     
-    def get_schedule_log_title(self):
-        start_date = str(self.getSimStart())
-        end_date = str(self.getSimEnd())
-        
-        return ("schedule_stats_" +
-                start_date + "_" +
-                end_date)
-        
-    def get_queue_length_log_title(self):
-        start_date = str(self.getSimStart())
-        end_date = str(self.getSimEnd())
-        
-        return ("queue_length_" +
-                start_date + "_" +
-                end_date)
-    
     def get_idle_nodes(self):
+        ''' number of ilde nodes '''
         return ComponentProxy(self.COMP_SYSTEM).get_idle_nodes() / 512
     
     def check_power_budget_available(self, active_jobs):
+        ''' check remaining power budget '''
         rest_power = self.getRestPowerBudget()
         
         if rest_power <= 0:
