@@ -1789,7 +1789,6 @@ class BGQsim(Simulator):
         #print "holding jobs: ", [(k,v[0].split("-")[-1]) for k, v in self.job_hold_dict.iteritems()]
         print "\n\n"
         
-        
     def post_simulation_handling(self):
         '''post screen after simulation completes'''
         #print self.first_yield_hold_time_dict
@@ -1800,6 +1799,7 @@ class BGQsim(Simulator):
     post_simulation_handling = exposed(post_simulation_handling)
 
     def get_running_job_power_usage(self):
+        ''' return current system power '''
         total_power = 0
         
         for runningjob in self.running_jobs:               
@@ -1816,6 +1816,10 @@ class BGQsim(Simulator):
         return len(self.running_jobs)
     get_running_job_number = exposed(get_running_job_number)
     
+    def get_running(self):
+        return self.num_running
+    get_running = exposed(get_running)
+    
     def get_utilization_rate(self):
         return (float(self.num_busy) / self.total_nodes)
     get_utilization_rate = exposed(get_utilization_rate)
@@ -1827,10 +1831,6 @@ class BGQsim(Simulator):
     def get_idle_nodes(self):
         return self.total_nodes - self.num_busy
     get_idle_nodes = exposed(get_idle_nodes)
-    
-    def get_running(self):
-        return self.num_running
-    get_running = exposed(get_running)
     
     def get_waiting(self):
         return self.num_waiting
